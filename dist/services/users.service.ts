@@ -7,27 +7,71 @@ const allUsers = async () => {
         // return await prisma.users.findMany()
         // const { id } = req.params
         const allUsers = await prisma.users.findMany()
-       // console.log(allUsers);
+        // console.log(allUsers);
         return allUsers;
     } catch (e) {
         throw new Error(e.message)
     }
 }
 
-const userById = async (id:number) => {
+const userById = async (id: number) => {
     try {
-        // return await prisma.users.findMany()
-        // const { id } = req.params
         const user = await prisma.users.findMany({
             where: { id: Number(id) },
         })
-        // console.log(user);
-        return(user);
+        return (user);
     } catch (e) {
         throw new Error(e.message)
     }
 }
 
-console.log(userById);
+const deleteUser = async (id: number) => {
+    try {
+        const user = await prisma.users.delete({
+            where: { id: Number(id) },
+        })
+        return (user);
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
 
-export default { allUsers, userById };
+const createUser =  async (email: string, roleId: number, admin: boolean) => {
+    try {
+        const result = await prisma.users.create({
+            data: {
+                email,
+                admin,
+                role: {
+                    connect: {
+                        id: Number(roleId)
+                    }
+                }
+            },
+        })
+        return (result);
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+const updateUser = async (id:number, email:string, roleId: number, admin: boolean) => {
+    try {    
+        const user = await prisma.users.update({
+            where: { id: id },
+            data: {
+                email,
+                admin,
+                role: {
+                    connect: {
+                        id: Number(roleId)
+                    }
+                }
+            },
+        })
+        return(user);
+    } catch (error) {
+        throw new Error(error.message)
+    }
+} 
+
+export default { allUsers, userById, deleteUser, createUser, updateUser};
