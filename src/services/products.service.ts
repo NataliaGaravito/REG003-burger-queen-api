@@ -53,21 +53,12 @@ const createProduct =  async (name: string, price: number, image: string, type:n
         throw new Error(error.message)
     }
 }
-const updateProduct = async (id: number, name: string, price: number, image: string, type:number) => {
+
+const updateProduct = async (id: number, data:any) => {
     try {    
         const user = await prisma.products.update({
-            where: { id: id },
-            data: {
-                name,
-                price,
-                image,
-                type: {
-                    connect: {
-                        id: Number(type)
-                    }
-                },
-        
-            },
+            where: { id },
+            data
         })
         return(user);
     } catch (error) {

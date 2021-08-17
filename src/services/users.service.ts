@@ -54,19 +54,11 @@ const createUser =  async (email: string, roleId: number, admin: boolean) => {
         throw new Error(error.message)
     }
 }
-const updateUser = async (id:number, email:string, roleId: number, admin: boolean) => {
+const updateUser = async (id:number, data: any) => {
     try {    
         const user = await prisma.users.update({
-            where: { id: id },
-            data: {
-                email,
-                admin,
-                role: {
-                    connect: {
-                        id: Number(roleId)
-                    }
-                }
-            },
+            where: { id },
+            data
         })
         return(user);
     } catch (error) {

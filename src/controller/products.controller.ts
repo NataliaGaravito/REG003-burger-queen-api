@@ -25,7 +25,6 @@ const deleteProductById = async (req:Request, res:Response) => {
     try {
         const { id } = req.params
         const deletedProduct = await productServices.deleteProduct(Number(id));
-        console.log("fetch " + deletedProduct);
         return res.status(200).json({product: deletedProduct});
     } catch (err) {
         return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })
@@ -36,7 +35,6 @@ const createProduct = async (req:Request, res:Response) => {
     try {
         const { name, price, image, type } = req.body;
         const createdProduct = await productServices.createProduct(String(name), Number(price), String(image), Number(type));
-        console.log("fetch " + createdProduct);
         return res.status(200).json({product: createdProduct});
     } catch (err) {
         return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })
@@ -46,9 +44,7 @@ const createProduct = async (req:Request, res:Response) => {
 const updateProduct = async (req:Request, res:Response) => {
     try {
         const { id } = req.params;
-        const { name, price, image, type } = req.body;        
-        const updatedProduct = await productServices.updateProduct(Number(id), String(name), Number(price), String(image), Number(type));
-        console.log("fetch " + updatedProduct);
+        const updatedProduct = await productServices.updateProduct(Number(id), req.body);
         return res.status(200).json({product: updatedProduct});
     } catch (err) {
         return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })

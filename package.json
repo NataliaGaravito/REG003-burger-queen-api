@@ -1,16 +1,21 @@
 {
-  "name": "REG003-burger-queen-api-typescript",
+  "name": "reg003-burger-queen-api-typescript",
   "version": "1.0.0",
   "description": "* [1. Preámbulo](#1-pre%C3%A1mbulo)\r * [2. Resumen del proyecto](#2-resumen-del-proyecto)\r * [3. Objetivos de aprendizaje](#3-objetivos-de-aprendizaje)\r * [4. Consideraciones generales](#4-consideraciones-generales)\r * [5. Criterios de aceptación mínimos del proyecto](#5-criterios-de-aceptaci%C3%B3n-m%C3%ADnimos-del-proyecto)\r * [6. Pistas, tips y lecturas complementarias](#6-pistas-tips-y-lecturas-complementarias)\r * [7 HTTP API Checklist](#7-http-api-checklist)",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "dependencies": {
+    "@prisma/client": "^2.29.1",
     "express": "^4.17.1",
     "prisma": "^2.29.0",
     "ts-node": "^10.2.0",
     "typescript": "^4.3.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/jest": "^27.0.1"
+  },
   "scripts": {
+    "start": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

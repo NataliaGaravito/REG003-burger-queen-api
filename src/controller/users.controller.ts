@@ -24,7 +24,6 @@ const deleteUserById = async (req:Request, res:Response) => {
     try {
         const { id } = req.params
         const deletedUser = await userServices.deleteUser(Number(id));
-        console.log("fetch " + deletedUser);
         return res.status(200).json({users: deletedUser});
     } catch (error) {
         return res.status(500).send(error.message)
@@ -35,7 +34,6 @@ const createUser = async (req:Request, res:Response) => {
     try {
         const { email, roleId, admin } = req.body;
         const createdUser = await userServices.createUser(String(email), Number(roleId), Boolean(admin));
-        console.log("fetch " + createdUser);
         return res.status(200).json({users: createdUser});
     } catch (error) {
         return res.status(500).send(error.message)
@@ -44,10 +42,8 @@ const createUser = async (req:Request, res:Response) => {
 
 const updateUser = async (req:Request, res:Response) => {
     try {
-        const { id } = req.params;
-        const { email, roleId, admin } = req.body;        
-        const updatedUser = await userServices.updateUser(Number(id), String(email), Number(roleId), Boolean(admin));
-        console.log("fetch " + updatedUser);
+        const { id } = req.params;       
+        const updatedUser = await userServices.updateUser(Number(id), req.body);
         return res.status(200).json({users: updatedUser});
     } catch (error) {
         return res.status(500).send(error.message)

@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const httpErrors = {
     400: 'Bad request',
     401: 'Unauthorized',
@@ -11,10 +13,12 @@ module.exports = (err, req, resp, next) => {
     const statusCode = (isKnownHTTPErrorStatus(err))
         ? err
         : err.statusCode || 500;
-    const message = err.message || httpErrors[statusCode] || err;
+    // const message = err.message || httpErrors[statusCode]  || err;  // Linea original
+    const message = err.message || httpErrors || err;
     if (statusCode === 500) {
         console.error(statusCode, message);
     }
     resp.status(statusCode).json({ statusCode, message });
     next();
 };
+//# sourceMappingURL=error.js.map
