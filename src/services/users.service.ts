@@ -1,14 +1,25 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient()
 
-const allUsers = async () => {
+const allUsers = async (page: number, limit: number) => {
     try {
-        // return await prisma.users.findMany()
-        // const { id } = req.params
-        const allUsers = await prisma.users.findMany()
-        // console.log(allUsers);
-        return allUsers;
+        // const limitPage = limit ? limit : 10;
+        const skip = (page-1) * limit;
+        const offset = page * limit;
+        const userCount = await prisma.users.count();
+        // const last = Math.trunc( userCount / limit);
+        const allUsers = await prisma.users.findMany({
+            skip: skip,
+            take: limit
+        })
+        let pagination = {
+            next: offset < userCount ? page + 1: null,
+            prev: skip > 0 ? page - 1 : null,
+            first: 1,
+            last : Math.trunc((userCount + limit - 1) / limit)
+        }
+        return { allUsers, pagination };
     } catch (e) {
         throw new Error(e.message)
     }
@@ -36,7 +47,7 @@ const deleteUser = async (id: number) => {
     }
 }
 
-const createUser =  async (email: string, roleId: number, admin: boolean) => {
+const createUser = async (email: string, roleId: number, admin: boolean) => {
     try {
         const result = await prisma.users.create({
             data: {
@@ -54,16 +65,16 @@ const createUser =  async (email: string, roleId: number, admin: boolean) => {
         throw new Error(error.message)
     }
 }
-const updateUser = async (id:number, data: any) => {
-    try {    
+const updateUser = async (id: number, data: any) => {
+    try {
         const user = await prisma.users.update({
             where: { id },
             data
         })
-        return(user);
+        return (user);
     } catch (error) {
         throw new Error(error.message)
     }
-} 
+}
 
-export default { allUsers, userById, deleteUser, createUser, updateUser};
+export default { allUsers, userById, deleteUser, createUser, updateUser };

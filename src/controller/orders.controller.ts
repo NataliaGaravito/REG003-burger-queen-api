@@ -4,10 +4,24 @@ import ordersServices from '../services/orders.service';
 
 const getAllOrders = async (req:Request, res:Response) => {
     try {
-        const fetchedOrders = await ordersServices.allOrders();
-        return res.status(200).json({product: fetchedOrders});
+        const { page, limit } = req.query;
+        const pageNumber = page? +page: 1;
+        const limitNumber = limit? +limit : 10;
+        const url = 'localhost:3000/api/orders?page=';
+
+        if (pageNumber <= 0 || limitNumber <=0) return res.status(400).json({errorMessage: "Invalid page/limit value"});
+
+        const fetchedOrders = await ordersServices.allOrders(Number(pageNumber), Number(limitNumber));
+        if (fetchedOrders.pagination.prev !== null) res.links({prev: url+fetchedOrders.pagination.prev}) 
+        if (fetchedOrders.pagination.next !== null) res.links({next: url+fetchedOrders.pagination.next})
+
+        return res.links({
+            first: url+fetchedOrders.pagination.first,
+            last: url+fetchedOrders.pagination.last,
+        }).status(200).json({ orders: fetchedOrders.allOrders });
+        
     } catch (err) {
-        return res.status(500).json({ message: 'Products not found!', error: err.message })
+        return res.status(500).json({ message: 'Orders not found!', error: err.message })
     }
 }
 
@@ -17,7 +31,7 @@ const getOrderById = async (req:Request, res:Response) => {
         const fetchedOrder = await ordersServices.orderById(Number(id));
         return res.status(200).json({product: fetchedOrder});
     } catch (err) {
-        return res.status(500).json({ message: 'Product not found!', error: err.message })
+        return res.status(500).json({ message: 'Order not found!', error: err.message })
     }
 }
 

@@ -4,8 +4,22 @@ import productServices from '../services/products.service';
 
 const getAllProducts = async (req:Request, res:Response) => {
     try {
-        const fetchedProducts = await productServices.allProducts();
-        return res.status(200).json({product: fetchedProducts});
+        const { page, limit } = req.query;
+        const pageNumber = page? +page: 1;
+        const limitNumber = limit? +limit : 10;
+        const url = 'localhost:3000/api/products?page=';
+
+        if (pageNumber <= 0 || limitNumber <=0) return res.status(400).json({errorMessage: "Invalid page/limit value"});
+
+        const fetchedProducts = await productServices.allProducts(Number(pageNumber), Number(limitNumber));
+        if (fetchedProducts.pagination.prev !== null) res.links({prev: url+fetchedProducts.pagination.prev}) 
+        if (fetchedProducts.pagination.next !== null) res.links({next: url+fetchedProducts.pagination.next})
+
+        return res.links({
+            first: url+fetchedProducts.pagination.first,
+            last: url+fetchedProducts.pagination.last,
+        }).status(200).json({ products: fetchedProducts.allProducts });
+
     } catch (err) {
         return res.status(500).json({ message: 'Products not found!', error: err.message })
     }

@@ -2,10 +2,24 @@ import { Request, Response } from "express";
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient()
 
-const allOrders = async () => {
+const allOrders = async (page:number, limit:number) => {
     try {
-        const allProducts = await prisma.orders.findMany()
-        return allProducts;
+        // const limitPage = limit ? limit : 10;
+        const skip = (page-1) * limit;
+        const offset = page * limit;
+        const ordersCount = await prisma.orders.count();
+        // const last = Math.trunc( ordersCount / limit);
+        const allOrders = await prisma.orders.findMany({
+            skip: skip,
+            take: limit
+        })
+        let pagination = {
+            next: offset < ordersCount ? page + 1: null,
+            prev: skip > 0 ? page - 1 : null,
+            first: 1,
+            last : Math.trunc((ordersCount + limit - 1) / limit)
+        }
+        return { allOrders, pagination };
     } catch (e) {
         throw new Error(e.message)
     }
