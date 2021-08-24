@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import productServices from '../services/products.service';
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 const getAllProducts = async (req:Request, res:Response) => {
     try {
         const { page, limit } = req.query;
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
-        const url = 'localhost:3000/api/products?page=';
+        const url = process.env.URL+'products?page=';
 
         if (pageNumber <= 0 || limitNumber <=0) return res.status(400).json({errorMessage: "Invalid page/limit value"});
 

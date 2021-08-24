@@ -17,12 +17,13 @@ model Roles{
 }
 
 model Users {
-  id      Int     @default(autoincrement()) @id
-  email   String  @unique
-  role    Roles   @relation(fields: [roleId], references: [id]) 
-  roleId  Int     @default(1)
-  admin   Boolean @default(false)
-  orders  Orders[]
+  id        Int     @default(autoincrement()) @id
+  email     String  @unique
+  password  String 
+  role      Roles   @relation(fields: [roleId], references: [id]) 
+  roleId    Int     @default(1)
+  admin     Boolean @default(false)
+  orders    Orders[]
 }
 
 model Type{

@@ -1,13 +1,15 @@
-import { Request, Response } from "express";
+import { Request, Response, urlencoded } from "express";
 import ordersServices from '../services/orders.service';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 const getAllOrders = async (req:Request, res:Response) => {
     try {
         const { page, limit } = req.query;
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
-        const url = 'localhost:3000/api/orders?page=';
+        const url = process.env.URL+'orders?page=';
 
         if (pageNumber <= 0 || limitNumber <=0) return res.status(400).json({errorMessage: "Invalid page/limit value"});
 

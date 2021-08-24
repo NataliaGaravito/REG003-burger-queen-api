@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
 import userServices from '../services/users.service';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const getAllUsers = async (req:Request, res:Response) => {
     try {
         const { page, limit } = req.query;
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
-        const url = 'localhost:3000/api/users?page=';
+        const url = process.env.URL+'users?page=';
 
         if (pageNumber <= 0 || limitNumber <=0) return res.status(400).json({errorMessage: "Invalid page/limit value"});
 
@@ -46,8 +48,8 @@ const deleteUserById = async (req:Request, res:Response) => {
 
 const createUser = async (req:Request, res:Response) => {
     try {
-        const { email, roleId, admin } = req.body;
-        const createdUser = await userServices.createUser(String(email), Number(roleId), Boolean(admin));
+        const { email, password, admin } = req.body;
+        const createdUser = await userServices.createUser(String(email), String(password), Boolean(admin));
         return res.status(200).json({users: createdUser});
     } catch (err) {
         return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })
@@ -56,7 +58,9 @@ const createUser = async (req:Request, res:Response) => {
 
 const updateUser = async (req:Request, res:Response) => {
     try {
-        const { id } = req.params;       
+        const { id } = req.params;   
+        console.log(" body " , req.body.email)   
+        console.log(" params " , req.params)  
         const updatedUser = await userServices.updateUser(Number(id), req.body);
         return res.status(200).json({users: updatedUser});
     } catch (err) {

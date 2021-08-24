@@ -1,6 +1,7 @@
 import { Request, response, Response } from "express";
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient()
+import bcrypt from 'bcryptjs';
 
 const allUsers = async (page: number, limit: number) => {
     try {
@@ -47,17 +48,13 @@ const deleteUser = async (id: number) => {
     }
 }
 
-const createUser = async (email: string, roleId: number, admin: boolean) => {
+const createUser = async (email: string, password: string, admin: boolean) => {
     try {
         const result = await prisma.users.create({
             data: {
                 email,
-                admin,
-                role: {
-                    connect: {
-                        id: Number(roleId)
-                    }
-                }
+                password: await bcrypt.hash(password, 10),
+                admin
             },
         })
         return (result);
@@ -65,6 +62,7 @@ const createUser = async (email: string, roleId: number, admin: boolean) => {
         throw new Error(error.message)
     }
 }
+
 const updateUser = async (id: number, data: any) => {
     try {
         const user = await prisma.users.update({
