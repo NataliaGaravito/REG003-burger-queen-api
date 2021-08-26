@@ -1,17 +1,18 @@
-import { Request, Response, urlencoded } from "express";
+import { Request, Response, NextFunction  } from "express";
+import error from '../middleware/error';
 import ordersServices from '../services/orders.service';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const getAllOrders = async (req:Request, res:Response) => {
+const getAllOrders = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { page, limit } = req.query;
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
         const url = process.env.URL+'orders?page=';
 
-        if (pageNumber <= 0 || limitNumber <=0) return res.status(400).json({errorMessage: "Invalid page/limit value"});
+        if (pageNumber <= 0 || limitNumber <=0) return error(400, req, res, next);
 
         const fetchedOrders = await ordersServices.allOrders(Number(pageNumber), Number(limitNumber));
         if (fetchedOrders.pagination.prev !== null) res.links({prev: url+fetchedOrders.pagination.prev}) 
@@ -23,48 +24,55 @@ const getAllOrders = async (req:Request, res:Response) => {
         }).status(200).json({ orders: fetchedOrders.allOrders });
         
     } catch (err) {
-        return res.status(500).json({ message: 'Orders not found!', error: err.message })
+        return error({statusCode: 500, message: err.meta.cause}, req, res, next);
     }
 }
 
-const getOrderById = async (req:Request, res:Response) => {
+const getOrderById = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const fetchedOrder = await ordersServices.orderById(Number(id));
-        return res.status(200).json({product: fetchedOrder});
+        if(fetchedOrder.length === 0) return error({statusCode: 404}, req, res, next);
+        return res.status(200).json({order: fetchedOrder});
     } catch (err) {
-        return res.status(500).json({ message: 'Order not found!', error: err.message })
+        return error({statusCode: 500, message: err.meta.cause}, req, res, next);
     }
 }
 
-const deleteOrderById = async (req:Request, res:Response) => {
+const deleteOrderById = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const deletedOrder = await ordersServices.deleteOrder(Number(id));
-        return res.status(200).json({product: deletedOrder});
+        return res.status(200).json({order: deletedOrder});
     } catch (err) {
-        return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })
+        return error({statusCode: 404, message: err.meta.cause}, req, res, next);
     }
 }
 
-const createOrder = async (req:Request, res:Response) => {
+const createOrder = async (req:Request, res:Response, next: NextFunction) => {
+    if(req.body.productsOrder.length <=0) return error({statusCode: 400, message: "No product(s) provided"}, req, res, next);
     try {
         const { userId, client, productsOrder } = req.body;
         const createdOrder = await ordersServices.createOrder(Number(userId), String(client), productsOrder);
-        return res.status(200).json({product: createdOrder});
+        return res.status(200).json({order: createdOrder});
     } catch (err) {
-        return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })
+        return error({statusCode: 400}, req, res, next);
     }
 }
 
-const updateOrder = async (req:Request, res:Response) => {
-    try {
-        const { id } = req.params;
-        const updatedOrder = await ordersServices.updateOrder(Number(id), req.body);
-        return res.status(200).json({product: updatedOrder});
-    } catch (err) {
-        return res.status(500).json({ message: 'Something went wrong, try again', error: err.message })
+const updateOrder = async (req:Request, res:Response, next: NextFunction) => {
+    if(Object.keys(req.body).length === 0) return error({statusCode: 400}, req, res, next);
+    else{
+        try {
+            const { id } = req.params;
+            const updatedOrder = await ordersServices.updateOrder(Number(id), req.body);
+            return res.status(200).json({order: updatedOrder});
+        } catch (err) {
+            if(err.code === 'P2025') return error({statusCode: 404, message: err.meta.cause}, req, res, next);
+            return error({statusCode: 400}, req, res, next);            
+        }
     }
+    
 }
 
 export default { getAllOrders, getOrderById, deleteOrderById, createOrder, updateOrder }

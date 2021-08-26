@@ -14,17 +14,17 @@ router.use(function timeLog(req, res, next) {
     // console.log('Time: ', Date.now());
     next();
 });
-router.use(validate(process.env.SECRET_TOKEN));
 
 //  ---------   RUTAS MÓDULO AUTH  ------------   //
 router.post('/auth', getAuth.generateToken);
+router.use(validate(process.env.SECRET_TOKEN));
 
 //  ---------   RUTAS MÓDULO USUARIOS  ------------   //
 router.get('/users', requireAdmin, getUsers.getAllUsers); 
 router.get('/users/:id', requireItSelf, getUsers.getUserById); // Requiere token de autenticación y que la usuaria sea admin o la usuaria a modificar
 router.post('/users', requireAdmin, getUsers.createUser);
 router.delete('/users/:id', requireItSelf, getUsers.deleteUserById); // Requiere token de autenticación y que la usuaria sea admin o la usuaria a modificar
-router.put('/users/:id', getUsers.updateUser); // Requiere token de autenticación y que la usuaria sea admin o la usuaria a modificar
+router.put('/users/:id', requireItSelf, getUsers.updateUser); // Requiere token de autenticación y que la usuaria sea admin o la usuaria a modificar
 
 //  ---------   RUTAS MÓDULO PRODUCTOS  ------------   //
 router.get('/products', requireAuth , getProducts.getAllProducts);

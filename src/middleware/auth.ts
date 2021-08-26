@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import error from '../middleware/error';
 const prisma = new PrismaClient();
 
 export default (secret: string) => (req: Request, resp: Response, next: NextFunction) => {
     const { authorization } = req.headers;
     if (!authorization) {
-        return next();
+        return next(error(401, req, resp, next));
     }
     const [type, token] = authorization.split(' ');
     if (type.toLowerCase() !== 'bearer') {
@@ -16,7 +17,7 @@ export default (secret: string) => (req: Request, resp: Response, next: NextFunc
     jwt.verify(token, secret, async (err: any, decodedToken: any) => {
         if (err) {
             req.auth = false;
-            return next(resp.json({ statusCode: 403, message: 'Need authentication' }))
+            return next(error(403, req, resp, next))
         }
         const user = await prisma.users.findUnique({ where: { id: decodedToken.userId } });
         req.userId = user.id;
@@ -36,17 +37,17 @@ export const isItSelf = (req: Request) => {
     return (req.userId === userId ? true : false)
 }
 
-export const requireAuth = (req: Request, resp: Response, next: NextFunction) => ((!isAuthenticated(req)) ? next({ statusCode: 401, message: 'Need authentication' }) : next());
+export const requireAuth = (req: Request, resp: Response, next: NextFunction) => ((!isAuthenticated(req)) ? next(error(401, req, resp, next)) : next());
 
 export const requireAdmin = (req: Request, resp: Response, next: NextFunction) => {
-    if (!isAuthenticated(req)) return next(resp.json({ statusCode: 401, message: 'Need authentication' }))
+    if (!isAuthenticated(req)) return next(error(401, req, resp, next))
     else if (!isAdmin(req)) return next(resp.json({ statusCode: 403, message: 'Need admin' }))
     else return next()
 };
 
 export const requireItSelf = (req: Request, resp: Response, next: NextFunction) => {
-    if (!isAuthenticated(req)) return next(resp.json({ statusCode: 401, message: 'Need authentication' }))
+    if (!isAuthenticated(req)) return next(error(401, req, resp, next))
     else if ((isAdmin(req)) ||(isItSelf(req))) return next()
-    else return next(resp.json({ statusCode: 403, message: 'Need admin' }))
+    else return next(error(403, req, resp, next))
 };
 

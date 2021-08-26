@@ -36,7 +36,7 @@ model Products {
   id            Int     @default(autoincrement()) @id
   name          String
   price         Decimal
-  image         String
+  image         String  @default("https://image.flaticon.com/icons/png/512/2924/2924213.png")
   type          Type    @relation(fields: [typeId], references: [id])
   typeId        Int     @default(1)
   dateEntry     DateTime @default(now())
