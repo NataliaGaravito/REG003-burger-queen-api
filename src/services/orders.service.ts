@@ -33,7 +33,7 @@ const deleteOrder = async (id: number) => {
     return (product);
 }
 
-const createOrder = async (userId: number, client: string, productsOrder: object) => {
+const createOrder = async (userId: number, client: string, products: object) => {
     const result = await prisma.orders.create({
         data: {
             client,
@@ -42,7 +42,7 @@ const createOrder = async (userId: number, client: string, productsOrder: object
                     id: Number(userId)
                 }
             },
-            productsOrder
+            productsOrder: products
         },
     })
     return (result);

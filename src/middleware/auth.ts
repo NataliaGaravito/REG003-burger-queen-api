@@ -23,6 +23,7 @@ export default (secret: string) => (req: Request, resp: Response, next: NextFunc
         req.userId = user.id;
         req.userAdmin = user.admin;
         req.auth = user;
+        req.email = user.email;
         return next();
     });
 };
@@ -33,8 +34,15 @@ export const isAdmin = (req: Request) => (req.userAdmin ? true : false);
 
 export const isItSelf = (req: Request) => {
     const { id } = req.params;
-    const userId: number = +id;
-    return (req.userId === userId ? true : false)
+    const isNan = isNaN(Number(id));
+    let itSelf ; 
+    if (isNan) {
+        itSelf = req.email === id ? true : false
+    } else {
+        const userId: number = +id;
+        itSelf = req.userId === userId ? true : false
+    }        
+    return (itSelf)  
 }
 
 export const requireAuth = (req: Request, resp: Response, next: NextFunction) => ((!isAuthenticated(req)) ? next(error(401, req, resp, next)) : next());

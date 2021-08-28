@@ -1,10 +1,12 @@
 import express = require('express');
 import BaseRouter from './routes/index';
+import * as config from './config';
+// import * as pkg from '../package.json';
 
 const app = express()
 const router = express.Router();
 app.use(express.json())
-
+// app.set('pkg', pkg);
 router.use((req, res, next) => {
     // set the CORS policy
     res.header('Access-Control-Allow-Origin', '*');
@@ -18,7 +20,7 @@ router.use((req, res, next) => {
     next();
 });
 
-app.use('/api', BaseRouter);
+app.use('/', BaseRouter);
 
 router.use((req, res, next) => {
     const error = new Error('not found');
@@ -27,9 +29,7 @@ router.use((req, res, next) => {
     });
 });
 
-
 // ... your REST API routes will go here
-
-app.listen(3000, () =>
-    console.log('REST API server ready at: http://localhost:3000'),
-)
+app.listen(config.port, () =>{
+    console.log('REST API server ready at: http://localhost:',config.port)
+})

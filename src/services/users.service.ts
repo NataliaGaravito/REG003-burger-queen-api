@@ -20,17 +20,26 @@ const allUsers = async (page: number, limit: number) => {
     return { allUsers, pagination };
 }
 
-const userById = async (id: number) => {
-    const user = await prisma.users.findMany({
-        where: { id: Number(id) },
+const userById = async (parameter: any) => {
+    const isNan = isNaN(Number(parameter));
+    const user = await isNan ? (prisma.users.findMany({
+        where:{ email: String(parameter) }
     })
+    ): (prisma.users.findMany({
+        where:{ id: Number(parameter) }
+    }))
     return (user);
 }
 
-const deleteUser = async (id: number) => {
-    const user = await prisma.users.delete({
-        where: { id: Number(id) },
+const deleteUser = async (parameter: any) => {
+    console.log(parameter)
+    const isNan = isNaN(Number(parameter));
+    const user = await isNan ? (prisma.users.delete({
+        where:{ email: String(parameter) }
     })
+    ): (prisma.users.delete({
+        where:{ id: Number(parameter) }
+    }))
     return (user);
 }
 
@@ -45,11 +54,15 @@ const createUser = async (email: string, password: string, admin: boolean) => {
     return (result);
 }
 
-const updateUser = async (id: number, data: any) => {
-    const user = await prisma.users.update({
-        where: { id },
-        data
+const updateUser = async (parameter: any, data: any) => {
+    const isNan = isNaN(Number(parameter));
+    data.password = await bcrypt.hash(data.password, 10);
+    const user = await isNan ? (prisma.users.update({
+        where:{ email: String(parameter) }, data
     })
+    ): (prisma.users.update({
+        where:{ id: Number(parameter) }, data
+    }))
     return (user);
 }
 

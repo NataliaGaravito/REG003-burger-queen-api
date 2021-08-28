@@ -6,7 +6,7 @@ const generateToken = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
         const token = await authService.generateToken(String(email), String(password));
-        return res.status(200).header('token', token).json({ email: email });        
+        return res.status(200).json({ token: token });         
     } catch (err) {
         return error(500, req, res, next);
     }

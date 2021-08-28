@@ -1,16 +1,14 @@
 import { Request, Response, NextFunction  } from "express";
 import error from '../middleware/error';
 import ordersServices from '../services/orders.service';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const getAllOrders = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { page, limit } = req.query;
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
-        const url = process.env.URL+'orders?page=';
+        // const url = process.env.URL+'orders?page=';
+        const url = '/orders?page=';
 
         if (pageNumber <= 0 || limitNumber <=0) return error(400, req, res, next);
 
@@ -50,12 +48,13 @@ const deleteOrderById = async (req:Request, res:Response, next: NextFunction) =>
 }
 
 const createOrder = async (req:Request, res:Response, next: NextFunction) => {
-    if(req.body.productsOrder.length <=0) return error({statusCode: 400, message: "No product(s) provided"}, req, res, next);
+    if((Object.keys(req.body).length === 0) || (req.body.products.length <=0)) return error({statusCode: 400, message: "No product(s) provided"}, req, res, next);
     try {
-        const { userId, client, productsOrder } = req.body;
-        const createdOrder = await ordersServices.createOrder(Number(userId), String(client), productsOrder);
+        const { userId, client, products } = req.body;
+        const createdOrder = await ordersServices.createOrder(Number(userId), String(client), products);
         return res.status(200).json({order: createdOrder});
     } catch (err) {
+        console.log(err)
         return error({statusCode: 400}, req, res, next);
     }
 }

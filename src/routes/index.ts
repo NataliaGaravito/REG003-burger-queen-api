@@ -5,19 +5,19 @@ import getOrders from '../controller/orders.controller';
 import getAuth from '../controller/auth.controller';
 import validate from '../middleware/auth';
 import { requireAdmin, requireAuth, requireItSelf } from '../middleware/auth';
-import dotenv from 'dotenv';
-dotenv.config();
+import * as config from "../config";
 
 const router = Router();
-
 router.use(function timeLog(req, res, next) {
     // console.log('Time: ', Date.now());
     next();
 });
 
+router.get('/', (req, res) => res.json({ name:'Burguer-queen-api', version: '1.0.0' }));
+
 //  ---------   RUTAS MÓDULO AUTH  ------------   //
 router.post('/auth', getAuth.generateToken);
-router.use(validate(process.env.SECRET_TOKEN));
+router.use(validate(config.secret));
 
 //  ---------   RUTAS MÓDULO USUARIOS  ------------   //
 router.get('/users', requireAdmin, getUsers.getAllUsers); 

@@ -25,11 +25,14 @@ describe('POST /orders', () => {
     })
         .then(([product, user]) => fetchAsTestUser('/orders', {
         method: 'POST',
-        body: { products: [{ productId: product._id, qty: 5, client: 'client' }], userId: user._id },
+        body: { products: [{ productId: product._id, qty: 5 }], userId: user.id, client: 'client' },
     }))
         .then((resp) => {
+        console.log(product._id, user.id), 
         expect(resp.status).toBe(200);
         return resp.json();
+    })  .catch((e)=>{
+        console.log(e)
     })
         .then((json) => {
         expect(typeof json._id).toBe('string');
@@ -54,7 +57,7 @@ describe('POST /orders', () => {
     })
         .then(([product, user]) => fetchAsAdmin('/orders', {
         method: 'POST',
-        body: { products: [{ productId: product._id, qty: 25 }], userId: user._id },
+        body: { products: [{ productId: product._id, qty: 25 }], userId: user.id },
     }))
         .then((resp) => {
         expect(resp.status).toBe(200);

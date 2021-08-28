@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import productServices from '../services/products.service';
 import error from '../middleware/error';
-import dotenv from 'dotenv';
-dotenv.config();
+// import config from "../config";
 
 const getAllProducts = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { page, limit } = req.query;
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
-        const url = process.env.URL+'products?page=';
+        const url = '/products?page=';
+        // const url = process.env.URL+'products?page=';
 
         if (pageNumber <= 0 || limitNumber <=0) return error(400, req, res, next);
 
