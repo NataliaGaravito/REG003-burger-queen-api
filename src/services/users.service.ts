@@ -32,7 +32,6 @@ const userById = async (parameter: any) => {
 }
 
 const deleteUser = async (parameter: any) => {
-    console.log(parameter)
     const isNan = isNaN(Number(parameter));
     const user = await isNan ? (prisma.users.delete({
         where:{ email: String(parameter) }
@@ -43,12 +42,12 @@ const deleteUser = async (parameter: any) => {
     return (user);
 }
 
-const createUser = async (email: string, password: string, admin: boolean) => {
+const createUser = async (email: string, password: string, roles: object) => {
     const result = await prisma.users.create({
         data: {
             email,
             password: await bcrypt.hash(password, 10),
-            admin
+            roles
         },
     })
     return (result);

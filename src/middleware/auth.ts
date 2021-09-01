@@ -4,6 +4,13 @@ import { PrismaClient } from '@prisma/client';
 import error from '../middleware/error';
 const prisma = new PrismaClient();
 
+type User = {
+    id: number
+    email: string
+    password: string
+    roles: any
+}
+
 export default (secret: string) => (req: Request, resp: Response, next: NextFunction) => {
     const { authorization } = req.headers;
     if (!authorization) {
@@ -19,9 +26,10 @@ export default (secret: string) => (req: Request, resp: Response, next: NextFunc
             req.auth = false;
             return next(error(403, req, resp, next))
         }
-        const user = await prisma.users.findUnique({ where: { id: decodedToken.userId } });
+        const user:User = await prisma.users.findUnique({ where: { id: decodedToken.userId } });
+        // console.log(user.roles.admin)
         req.userId = user.id;
-        req.userAdmin = user.admin;
+        req.userAdmin = user.roles.admin;
         req.auth = user;
         req.email = user.email;
         return next();
@@ -49,8 +57,8 @@ export const requireAuth = (req: Request, resp: Response, next: NextFunction) =>
 
 export const requireAdmin = (req: Request, resp: Response, next: NextFunction) => {
     if (!isAuthenticated(req)) return next(error(401, req, resp, next))
-    else if (!isAdmin(req)) return next(resp.json({ statusCode: 403, message: 'Need admin' }))
-    else return next()
+    else if (isAdmin(req)) return next()
+    else return next(error({code: 403, message: 'Need admin'},req, resp, next))
 };
 
 export const requireItSelf = (req: Request, resp: Response, next: NextFunction) => {

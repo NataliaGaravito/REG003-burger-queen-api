@@ -1,6 +1,6 @@
 const url = require('url');
 const qs = require('querystring');
-const config = require('../config');
+const config = require('../dist/config');
 const { fetch, fetchAsTestUser, fetchAsAdmin, fetchWithAuth, } = process;
 const parseLinkHeader = (str) => str.split(',')
     .reduce((memo, item) => {

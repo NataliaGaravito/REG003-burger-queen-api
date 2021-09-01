@@ -1,7 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import productServices from '../services/products.service';
 import error from '../middleware/error';
-// import config from "../config";
+import { Decimal } from "@prisma/client/runtime";
+
+type CreatedProductResponse = {
+    id: number
+    _id?: number | string;
+    name: string;
+    price: Decimal;
+    image: string;
+    type: string;
+    dateEntry: Date;
+} 
 
 const getAllProducts = async (req:Request, res:Response, next: NextFunction) => {
     try {
@@ -9,7 +19,6 @@ const getAllProducts = async (req:Request, res:Response, next: NextFunction) => 
         const pageNumber = page? +page: 1;
         const limitNumber = limit? +limit : 10;
         const url = '/products?page=';
-        // const url = process.env.URL+'products?page=';
 
         if (pageNumber <= 0 || limitNumber <=0) return error(400, req, res, next);
 
@@ -20,7 +29,7 @@ const getAllProducts = async (req:Request, res:Response, next: NextFunction) => 
         return res.links({
             first: url+fetchedProducts.pagination.first,
             last: url+fetchedProducts.pagination.last,
-        }).status(200).json({ products: fetchedProducts.allProducts });
+        }).status(200).json(fetchedProducts.allProducts);
 
     } catch (err) {
         return error(500, req, res, next);
@@ -28,21 +37,31 @@ const getAllProducts = async (req:Request, res:Response, next: NextFunction) => 
 }
 
 const getProductById = async (req:Request, res:Response, next: NextFunction) => {
+    const { id } = req.params;
+    const isNan = isNaN(Number(id));
+    if(isNan) return error({statusCode: 404}, req, res, next);
     try {
-        const { id } = req.params
         const fetchedProduct = await productServices.productById(Number(id));
+        const responseProduct:CreatedProductResponse = { ...fetchedProduct[0] }
+        responseProduct._id = fetchedProduct[0].id
+        delete responseProduct.id
         if(fetchedProduct.length === 0) return error({statusCode: 404}, req, res, next);
-        return res.status(200).json({product: fetchedProduct});
+        return res.status(200).json(responseProduct);
     } catch (err) {
         return error(500, req, res, next);
     }
 }
 
 const deleteProductById = async (req:Request, res:Response, next: NextFunction) => {
+    const { id } = req.params;
+    const isNan = isNaN(Number(id));
+    if(isNan) return error({statusCode: 404}, req, res, next);
     try {
-        const { id } = req.params
         const deletedProduct = await productServices.deleteProduct(Number(id));
-        return res.status(200).json({product: deletedProduct});
+        const responseProduct:CreatedProductResponse = { ...deletedProduct }
+        responseProduct._id = deletedProduct.id
+        delete responseProduct.id
+        return res.status(200).json(responseProduct);
     } catch (err) {
         if(err.code === 'P2025') return error({statusCode: 404, message: err.meta.cause}, req, res, next);
         return error(500, req, res, next);
@@ -54,7 +73,10 @@ const createProduct = async (req:Request, res:Response, next: NextFunction) => {
     if ((name == undefined) || (price == undefined)) return error(400, req, res, next);
     try {
         const createdProduct = await productServices.createProduct(req.body);
-        return res.status(200).json({product: createdProduct});
+        const responseProduct:CreatedProductResponse = { ...createdProduct }
+        responseProduct._id = createdProduct.id
+        delete responseProduct.id
+        return res.status(200).json(responseProduct);
     } catch (err) {
         return error(500, req, res, next);
     }
@@ -65,7 +87,10 @@ const updateProduct = async (req:Request, res:Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const updatedProduct = await productServices.updateProduct(Number(id), req.body);
-        return res.status(200).json({product: updatedProduct});
+        const responseProduct:CreatedProductResponse = { ...updatedProduct }
+        responseProduct._id = updatedProduct.id
+        delete responseProduct.id
+        return res.status(200).json(responseProduct);
     } catch (err) {
         if(err.code === 'P2025') return error({statusCode: 404, message: err.meta.cause}, req, res, next);
             return error({statusCode: 400}, req, res, next); 
