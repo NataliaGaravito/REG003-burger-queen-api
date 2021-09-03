@@ -3,6 +3,8 @@ const { spawn } = require('child_process');
 const nodeFetch = require('node-fetch');
 const kill = require('tree-kill');
 const config = require('../dist/config');
+const compose = require ("docker-compose");
+
 const { response } = require('express');
 const port = process.env.PORT || 3000;
 const baseUrl = process.env.REMOTE_URL || `http://127.0.0.1:${port}`;
@@ -91,6 +93,12 @@ module.exports = () => new Promise((resolve, reject) => {
         return resolve();
     }
     // TODO: Configurar DB de tests
+    // compose.upAll({ cwd: '../docker-compose-test.yml', log: true })
+    // .then(
+    // () => { console.log('done')},
+    // err => { console.log('something went wrong:', err.message)}
+    // );
+
     console.info('Staring local server...');
     const child = spawn('node', ['dist/index.js', process.env.PORT || 8888], {
         cwd: path.resolve(__dirname, '../'),

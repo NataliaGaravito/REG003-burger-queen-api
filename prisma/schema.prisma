@@ -20,7 +20,7 @@ model Users {
 }
 
 model Products {
-  id            Int     @default(autoincrement()) @id
+  id            Int       @default(autoincrement()) @id
   name          String
   price         Decimal
   image         String?   @default("https://image.flaticon.com/icons/png/512/2924/2924213.png")

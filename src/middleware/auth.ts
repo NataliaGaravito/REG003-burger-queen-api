@@ -27,7 +27,7 @@ export default (secret: string) => (req: Request, resp: Response, next: NextFunc
             return next(error(403, req, resp, next))
         }
         const user:User = await prisma.users.findUnique({ where: { id: decodedToken.userId } });
-        // console.log(user.roles.admin)
+        if(!user) error(400, req, resp, next)
         req.userId = user.id;
         req.userAdmin = user.roles.admin;
         req.auth = user;
@@ -58,7 +58,7 @@ export const requireAuth = (req: Request, resp: Response, next: NextFunction) =>
 export const requireAdmin = (req: Request, resp: Response, next: NextFunction) => {
     if (!isAuthenticated(req)) return next(error(401, req, resp, next))
     else if (isAdmin(req)) return next()
-    else return next(error({code: 403, message: 'Need admin'},req, resp, next))
+    else return next(error(403 ,req, resp, next))
 };
 
 export const requireItSelf = (req: Request, resp: Response, next: NextFunction) => {

@@ -4,11 +4,11 @@ services:
     image: postgres:10.3
     restart: always
     environment:
-      - POSTGRES_DB=bqTypescript
+      - POSTGRES_DB=postgres
       - POSTGRES_USER=bq
       - POSTGRES_PASSWORD=secret
-    volumes:
-      - postgres:/var/lib/postgresql/data
+    # volumes:
+    #   - postgres:/var/lib/postgresql/data
     ports:
       - '5432:5432'    
   admin:

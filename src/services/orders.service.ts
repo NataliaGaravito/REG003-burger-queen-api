@@ -5,9 +5,10 @@ const prisma = new PrismaClient()
 const getProductDetails = async (result:any) =>{
     let newArrayProducts: any = {...result};
     newArrayProducts = await Promise.all(newArrayProducts.products.map( async(elem:any) => {
+        const numberProductId =  +elem.productId;
         const product = await prisma.products.findUnique({
             where: {
-                id: elem.productId,
+                id: numberProductId,
             },
         })
         elem.product = {
@@ -40,8 +41,8 @@ const orderById = async (id: number) => {
     const result = await prisma.orders.findMany({
         where: { id: Number(id) },
     })
+    if((result === undefined) || (result.length === 0)) return ([]);
     const finalResult = await getProductDetails(result[0]);
-    // console.log(finalResult)
     return (finalResult);
 }
 
