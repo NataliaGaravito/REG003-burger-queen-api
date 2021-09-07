@@ -7,5 +7,5 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build 
 COPY .env ./dist/
-WORKDIR ./dist
+WORKDIR ./dist/src
 CMD node index.js
