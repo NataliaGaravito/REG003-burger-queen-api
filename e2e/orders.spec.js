@@ -24,17 +24,15 @@ describe('POST /orders', () => {
         return Promise.all([responses[0].json(), responses[1].json()]);
     })
         .then(([product, user]) => {
-            console.log(product, user)
-        fetchAsTestUser('/orders', {
+        return fetchAsTestUser('/orders', {
         method: 'POST',
         body: { products: [{ productId: product._id, qty: 5 }], userId: user._id, client: 'client' },
     })})
         .then((resp) => { 
         expect(resp.status).toBe(200);
         return resp.json();
-    })  .catch((e) => console.log("ERROR1", e))
+    })
         .then((json) => {
-        console.log("JSON create order as user", json)
         expect(typeof json._id).toBe('string');
         expect(json.client).toBe('client');
         expect(typeof json.dateEntry).toBe('string');
@@ -63,9 +61,8 @@ describe('POST /orders', () => {
         .then((resp) => {
         expect(resp.status).toBe(200);
         return resp.json();
-    }).catch((e)=>console.log("error" , e))
+    })
         .then((json) => {
-        console.log("json que no funciona", json)
         expect(typeof json._id).toBe('string');
         expect(typeof json.dateEntry).toBe('string');
         expect(Array.isArray(json.products)).toBe(true);
@@ -188,7 +185,6 @@ describe('GET /orders/:orderId', () => {
         return resp.json();
     })
         .then((json) => {
-            console.log("json", json)
         expect(json.products.length).toBe(1);
         expect(json.products[0].product.name).toBe('Test');
         expect(json.products[0].product.price).toBe(99);

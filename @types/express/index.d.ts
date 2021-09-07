@@ -1,8 +1,8 @@
 declare namespace Express {
-    export interface Request {
-      userAdmin?: Boolean,
-      userId?: Number,
-      auth?: Object,
-      email?: String
-    }
+  export interface Request {
+    userAdmin?: boolean,
+    userId?: number,
+    auth?: Record<string, unknown>,
+    email?: string
+  }
 }

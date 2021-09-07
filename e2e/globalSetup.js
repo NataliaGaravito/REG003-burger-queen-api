@@ -2,8 +2,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 const nodeFetch = require('node-fetch');
 const kill = require('tree-kill');
-const config = require('../dist/config');
-const compose = require ("docker-compose");
+const config = require('../dist/src/config');
+// const compose = require ("docker-compose");
 
 const { response } = require('express');
 const port = process.env.PORT || 3000;
@@ -100,7 +100,7 @@ module.exports = () => new Promise((resolve, reject) => {
     // );
 
     console.info('Staring local server...');
-    const child = spawn('node', ['dist/index.js', process.env.PORT || 8888], {
+    const child = spawn('node', ['dist/src/index.js', process.env.PORT || 8888], {
         cwd: path.resolve(__dirname, '../'),
         stdio: ['ignore', 'pipe', 'pipe'],
     });

@@ -1,6 +1,6 @@
 const url = require('url');
 const qs = require('querystring');
-const config = require('../dist/config');
+const config = require('../dist/src/config');
 const { fetch, fetchAsTestUser, fetchAsAdmin, fetchWithAuth, } = process;
 const parseLinkHeader = (str) => str.split(',')
     .reduce((memo, item) => {
@@ -141,7 +141,7 @@ describe('PUT /users/:uid', () => {
         .then((resp) => expect(resp.status).toBe(401))));
     it('should fail with 403 when not owner nor admin', () => (fetchAsTestUser(`/users/${config.adminEmail}`, { method: 'PUT' })
         .then((resp) => expect(resp.status).toBe(403))));
-    it('should fail with 404 when admin and not found', () => (fetchAsAdmin('/users/abc@def.gih', { method: 'PUT' })
+    it('should fail with 404 when admin and not found', () => (fetchAsAdmin('/users/abc@def.gih', { method: 'PUT' , body: { roles: { admin: true } },})
         .then((resp) => expect(resp.status).toBe(404))));
     it('should fail with 400 when no props to update', () => (fetchAsTestUser('/users/test@test.test', { method: 'PUT' })
         .then((resp) => expect(resp.status).toBe(400))));
